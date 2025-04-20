@@ -32,8 +32,8 @@ jobs:
 
       - name: Commit and Push
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name ailabsgenerative
+          git config user.email ailabsgenerative@gmail.com
           git add .
           git commit -m "Add blog post $DATE" || echo "No changes"
           git push
