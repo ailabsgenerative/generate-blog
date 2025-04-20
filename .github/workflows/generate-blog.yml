@@ -17,7 +17,7 @@ jobs:
         run: |
           DATE=$(date +"%Y-%m-%d")
           mkdir -p posts
-          curl -s "https://text.pollinations.ai/今日の技術トピックを300字で解説" > tmp.txt
+          curl -s "https://text.pollinations.ai/くすっと笑える小話を書いて。1分くらいで読めるものがいいな。" > tmp.txt
           echo "## ${DATE} の記事" > posts/${DATE}.md
           cat tmp.txt >> posts/${DATE}.md
 
