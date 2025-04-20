@@ -2,7 +2,7 @@ name: Generate Blog
 
 on:
   schedule:
-    - cron: '*/10 * * * *' # 10分ごとに実行
+    - cron: '0 3 * * *' # 毎日12:00 JST
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
           DATE=$(date +"%Y-%m-%d")
           TIME=$(date +"%H-%M")
           mkdir -p posts
-          curl -s "https://text.pollinations.ai/くすっと笑える小話を書いて。1分くらいで読めるものがいいな。" > tmp.txt
+          curl -s "https://text.pollinations.ai/くすっと笑える小話を書いて。5分くらいで読めるものがいいな。" > tmp.txt
           echo "## ${DATE} ${TIME} の記事" > posts/${DATE}-${TIME}.md
           cat tmp.txt >> posts/${DATE}-${TIME}.md
 
