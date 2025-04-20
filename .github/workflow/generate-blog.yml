@@ -1,0 +1,38 @@
+# .github/workflows/generate-blog.yml
+name: Generate Blog
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 毎日12:00 JST
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate post with Pollinations
+        run: |
+          DATE=$(date +"%Y-%m-%d")
+          mkdir -p posts
+          curl -s "https://api.pollinations.ai/prompt/今日の技術トピックを300字で解説" > tmp.txt
+          echo "## ${DATE} の記事" > posts/${DATE}.md
+          cat tmp.txt >> posts/${DATE}.md
+
+      - name: Update index.html
+        run: |
+          echo "<html><body><h1>Blog</h1><ul>" > index.html
+          for file in posts/*.md; do
+            title=$(head -n 1 "$file")
+            echo "<li><a href=\"$file\">$title</a></li>" >> index.html
+          done
+          echo "</ul></body></html>" >> index.html
+
+      - name: Commit and Push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Add blog post $DATE" || echo "No changes"
+          git push
