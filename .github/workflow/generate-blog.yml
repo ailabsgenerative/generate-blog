@@ -1,5 +1,6 @@
 # .github/workflows/generate-blog.yml
 name: Generate Blog
+# trigger
 
 on:
   schedule:
