@@ -1,41 +1,41 @@
-name: Generate Blog
+# name: Generate Blog
 
-on:
-  schedule:
-    - cron: '0 3 * * *' # 毎日12:00 JST
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: '0 3 * * *' # 毎日12:00 JST
+#   workflow_dispatch:
 
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+# jobs:
+#   generate:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
 
-      - name: Generate post with Pollinations
-        run: |
-          DATE=$(date +"%Y-%m-%d")
-          TIME=$(date +"%H-%M")
-          mkdir -p posts
-          curl -s "https://text.pollinations.ai/くすっと笑える小話を書いて。5分くらいで読めるものがいいな。" > tmp.txt
-          echo "## ${DATE} ${TIME} の記事" > posts/${DATE}-${TIME}.md
-          cat tmp.txt >> posts/${DATE}-${TIME}.md
+#       - name: Generate post with Pollinations
+#         run: |
+#           DATE=$(date +"%Y-%m-%d")
+#           TIME=$(date +"%H-%M")
+#           mkdir -p posts
+#           curl -s "https://text.pollinations.ai/くすっと笑える小話を書いて。5分くらいで読めるものがいいな。" > tmp.txt
+#           echo "## ${DATE} ${TIME} の記事" > posts/${DATE}-${TIME}.md
+#           cat tmp.txt >> posts/${DATE}-${TIME}.md
 
-      - name: Update index.html
-        run: |
-          echo "<html><body><h1>Blog</h1><ul>" > index.html
-          for file in posts/*.md; do
-            title=$(head -n 1 "$file")
-            echo "<li><a href=\"$file\">$title</a></li>" >> index.html
-          done
-          echo "</ul></body></html>" >> index.html
+#       - name: Update index.html
+#         run: |
+#           echo "<html><body><h1>Blog</h1><ul>" > index.html
+#           for file in posts/*.md; do
+#             title=$(head -n 1 "$file")
+#             echo "<li><a href=\"$file\">$title</a></li>" >> index.html
+#           done
+#           echo "</ul></body></html>" >> index.html
 
-      - name: Commit and Push
-        env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "ailabsgenerative"
-          git config user.email "ailabsgenerative@gmail.com"
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
-          git add .
-          git commit -m "Add blog post $(date +'%Y-%m-%d %H:%M')" || echo "No changes"
-          git push origin HEAD
+#       - name: Commit and Push
+#         env:
+#           TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           git config user.name "ailabsgenerative"
+#           git config user.email "ailabsgenerative@gmail.com"
+#           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+#           git add .
+#           git commit -m "Add blog post $(date +'%Y-%m-%d %H:%M')" || echo "No changes"
+#           git push origin HEAD
