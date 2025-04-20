@@ -1,10 +1,8 @@
-# .github/workflows/generate-blog.yml
 name: Generate Blog
-# trigger
 
 on:
   schedule:
-    - cron: '0 3 * * *' # 毎日12:00 JST
+    - cron: '*/10 * * * *' # 10分ごとに実行
   workflow_dispatch:
 
 jobs:
@@ -16,10 +14,11 @@ jobs:
       - name: Generate post with Pollinations
         run: |
           DATE=$(date +"%Y-%m-%d")
+          TIME=$(date +"%H-%M")
           mkdir -p posts
           curl -s "https://text.pollinations.ai/くすっと笑える小話を書いて。1分くらいで読めるものがいいな。" > tmp.txt
-          echo "## ${DATE} の記事" > posts/${DATE}.md
-          cat tmp.txt >> posts/${DATE}.md
+          echo "## ${DATE} ${TIME} の記事" > posts/${DATE}-${TIME}.md
+          cat tmp.txt >> posts/${DATE}-${TIME}.md
 
       - name: Update index.html
         run: |
@@ -38,5 +37,5 @@ jobs:
           git config user.email "ailabsgenerative@gmail.com"
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           git add .
-          git commit -m "Add blog post $DATE" || echo "No changes"
+          git commit -m "Add blog post $(date +'%Y-%m-%d %H:%M')" || echo "No changes"
           git push origin HEAD
