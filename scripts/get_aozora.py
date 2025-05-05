@@ -1,10 +1,24 @@
 import re
 import requests
+from bs4 import BeautifulSoup
 
-def download_aozora_txt(url: str) -> str:
+def get_txt_url_from_html_page(page_url: str) -> str:
+    """作品ページのHTMLから .txt ファイルのURLを抽出"""
+    response = requests.get(page_url)
+    response.encoding = 'shift_jis'
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    link = soup.find('a', string='テキストファイル')
+    if not link:
+        raise ValueError("テキストファイルのリンクが見つかりません")
+
+    href = link['href']
+    return f"https://www.aozora.gr.jp{href}"
+
+def download_aozora_txt(txt_url: str) -> str:
     """青空文庫のtxtファイルをURLからダウンロード"""
-    response = requests.get(url)
-    response.encoding = 'shift_jis'  # 青空文庫のテキストはShift_JIS
+    response = requests.get(txt_url)
+    response.encoding = 'shift_jis'
     return response.text
 
 def extract_main_text(text: str) -> str:
@@ -23,11 +37,15 @@ def extract_main_text(text: str) -> str:
 
     return main_text.strip()
 
-# 使用例（老妓抄）
-url = "https://www.aozora.gr.jp/cards/001257/files/59898_70731.txt"
+# 作品ページ（例：こころ）
+page_url = "https://www.aozora.gr.jp/cards/000020/files/2569_28291.html"
 
-raw_text = download_aozora_txt(url)
+# テキストURLを取得して本文を整形
+txt_url = get_txt_url_from_html_page(page_url)
+print(f"📄 テキストURL: {txt_url}")
+
+raw_text = download_aozora_txt(txt_url)
 clean_text = extract_main_text(raw_text)
 
-# 結果を表示
-print(clean_text[:1000])  # 上位1000文字を表示
+# 上位1000文字を表示
+print(clean_text[:1000])
