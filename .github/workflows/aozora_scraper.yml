@@ -23,4 +23,4 @@ jobs:
 
     - name: Run script
       run: |
-        python jobs/get_aozora.py
+        python jobs/aozora_scraper.py
