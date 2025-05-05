@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # 青空文庫の作家一覧ページなどのURL
-url = "https://www.aozora.gr.jp/"
+url = "https://www.aozora.gr.jp/index_pages/person_a.html"
 
 # ウェブページの内容を取得
 response = requests.get(url)
