@@ -1,4 +1,4 @@
-name: Run Aozora Scraper
+name: Run Aozora Scraper Python
 
 on:
   workflow_dispatch:  # 手動実行トリガー

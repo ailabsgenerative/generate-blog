@@ -1,12 +1,12 @@
-name: Run Aozora Scraper
+name: Run Aozora Scraper Go
+
+uses: actions/setup-go@v4
+with:
+  go-version: '^1.20'  # Ensure a modern Go version (e.g., 1.20.x)
+  cache: true  # Enable caching to speed up builds
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:  # 手動実行トリガー
 
 jobs:
   execute-aozora-scraper:
