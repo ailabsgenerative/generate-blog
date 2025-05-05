@@ -22,7 +22,6 @@ jobs:
 
       - name: Fetch Aozora Bunko text
         run: |
-          mkdir -p data
           python3 scripts/fetch_aozora_text.py "https://www.aozora.gr.jp/cards/000020/files/2569_28291.html"
 
       - name: Commit and Push
