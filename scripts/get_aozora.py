@@ -3,17 +3,17 @@ import requests
 from bs4 import BeautifulSoup
 
 def get_txt_url_from_html_page(page_url: str) -> str:
-    """作品ページのHTMLから .txt ファイルのURLを抽出"""
+    """作品ページのHTMLから .txt ファイルのURLを抽出（より柔軟に）"""
     response = requests.get(page_url)
     response.encoding = 'shift_jis'
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    link = soup.find('a', string='テキストファイル')
-    if not link:
-        raise ValueError("テキストファイルのリンクが見つかりません")
+    for link in soup.find_all('a', href=True):
+        href = link['href']
+        if href.endswith('.txt') and not href.startswith('http'):
+            return f"https://www.aozora.gr.jp{href}"
 
-    href = link['href']
-    return f"https://www.aozora.gr.jp{href}"
+    raise ValueError("テキストファイルのリンクが見つかりません")
 
 def download_aozora_txt(txt_url: str) -> str:
     """青空文庫のtxtファイルをURLからダウンロード"""
