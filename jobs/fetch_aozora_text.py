@@ -30,7 +30,7 @@ def fetch_aozora_text(url):
         body_text = "本文が見つかりませんでした。"
 
     # データを保存
-    file_path = os.path.join("data", f"{sanitized_title}.txt")
+    file_path = os.path.join("aozora_data", f"{sanitized_title}.txt")
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(f"タイトル: {title}\n\n")
         f.write(body_text)
