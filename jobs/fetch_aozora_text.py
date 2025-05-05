@@ -29,8 +29,15 @@ def fetch_aozora_text(url):
     else:
         body_text = "本文が見つかりませんでした。"
 
+    # 保存先ディレクトリ
+    output_dir = "aozora_data"
+
+    # ディレクトリが存在しない場合は作成
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     # データを保存
-    file_path = os.path.join("aozora_data", f"{sanitized_title}.txt")
+    file_path = os.path.join(output_dir, f"{sanitized_title}.txt")
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(f"タイトル: {title}\n\n")
         f.write(body_text)
