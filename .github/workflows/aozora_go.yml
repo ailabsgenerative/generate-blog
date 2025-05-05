@@ -1,0 +1,32 @@
+name: Run Aozora Scraper
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  execute-aozora-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+    # リポジトリをチェックアウト
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Goのセットアップ
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.20  # 必要なGoのバージョン
+
+    # 依存関係のインストール
+    - name: Install dependencies
+      run: go mod tidy
+
+    # jobs/aozora_scraper.go の実行
+    - name: Run Aozora Scraper
+      run: go run jobs/aozora_scraper.go
