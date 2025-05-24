@@ -40,27 +40,19 @@ jobs:
           # 環境変数からAPIキーを取得
           api_key = os.getenv('GOOGLE_API_KEY')
           if not api_key:
-              print("Error: GOOGLE_API_KEY environment variable is not set.", file=sys.stderr) # os.stderr を sys.stderr に修正
-              sys.exit(1) # exit(1) を sys.exit(1) に修正
+              print("Error: GOOGLE_API_KEY environment variable is not set.", file=sys.stderr)
+              sys.exit(1)
 
           genai.configure(api_key=api_key)
 
           try:
-              # 利用可能なモデルを確認して最適なものを選択することを推奨
-              # 例: モデルのリストを確認して、generateContent をサポートするモデルを選ぶ
-              # for m in genai.list_models():
-              #     if 'generateContent' in m.supported_generation_methods:
-              #         print(f"Available model: {m.name}")
-
-              # 現在推奨されているモデルは 'gemini-1.5-pro-latest' など
-              # または、APIのバージョンによって異なる可能性があります。
-              # 最新の利用可能なモデルについては、Google AI Studioのドキュメントを確認してください。
-              model = genai.GenerativeModel('gemini-1.5-pro-latest') # または 'gemini-pro' が動作する可能性も考慮
+              # より軽量なモデル 'gemini-pro' を試す
+              model = genai.GenerativeModel('gemini-pro') # ここを変更
 
               prompt = "くすっと笑える小話を書いて。5分くらいで読めるものがいいな。"
 
               # 生成処理
-              print(f"Calling Gemini API with prompt: '{prompt}'", file=sys.stderr) # デバッグ用にstderrに出力
+              print(f"Calling Gemini API with prompt: '{prompt}'", file=sys.stderr)
               response = model.generate_content(prompt)
               generated_text = response.text.strip()
 
@@ -68,20 +60,18 @@ jobs:
               now = datetime.datetime.now()
               header_date = now.strftime("%Y-%m-%d")
               header_time = now.strftime("%H:%M")
-              print(f"## {header_date} {header_time} の記事") # 標準出力に記事内容を出力
+              print(f"## {header_date} {header_time} の記事")
               print(generated_text)
 
           except Exception as e:
-              print(f"An error occurred: {e}", file=sys.stderr) # sys.stderr に修正
-              sys.exit(1) # sys.exit(1) に修正
+              print(f"An error occurred: {e}", file=sys.stderr)
+              sys.exit(1)
           EOF
 
       - name: Update index.html
         run: |
           echo "<html><body><h1>Blog</h1><ul>" > index.html
           for file in posts/*.md; do
-            # 記事のタイトル（MarkdownのH2見出し）を抽出
-            # ファイルの最初の行を読み込み、'## 'を取り除く
             title=$(head -n 1 "$file" | sed 's/^## //')
             echo "<li><a href=\"$file\">$title</a></li>" >> index.html
           done
@@ -89,10 +79,10 @@ jobs:
 
       - name: Commit and Push
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }} # 自動的に提供されるトークン
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]" # GitHub Actionsの公式botユーザー名
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com" # GitHub Actionsの公式botメールアドレス
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Add new blog post $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit" # 変更がなければコミットしない
+          git commit -m "Add new blog post $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
           git push origin HEAD
