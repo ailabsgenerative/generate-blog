@@ -6,7 +6,12 @@ title: 今日の謎解き
 # Markdownレンダラー（GitHub Pagesの推奨はkramdownまたはGFM）
 markdown: kramdown
 
-# Jekyllが無視するファイルやディレクトリ（もしあれば）
+# GitHub Pagesのリポジトリ名を設定
+# https://ailabsgenerative.github.io/generate-blog/ の場合、
+# リポジトリ名は 'generate-blog' です。
+baseurl: "/generate-blog" # あなたのリポジトリ名に合わせて変更してください！
+
+# Jekyllが無視するファイルやディレクトリ
 exclude:
   - .github
   - .gitignore
