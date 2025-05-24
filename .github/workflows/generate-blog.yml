@@ -1,3 +1,4 @@
+# .github/workflows/generate-blog.yml
 name: Generate Blog Post with Gemini
 
 on:
@@ -34,20 +35,32 @@ jobs:
           import os
           import google.generativeai as genai
           import datetime
+          import sys # sysモジュールをインポート
 
           # 環境変数からAPIキーを取得
           api_key = os.getenv('GOOGLE_API_KEY')
           if not api_key:
-              print("Error: GOOGLE_API_KEY environment variable is not set.", file=os.stderr)
-              exit(1)
+              print("Error: GOOGLE_API_KEY environment variable is not set.", file=sys.stderr) # os.stderr を sys.stderr に修正
+              sys.exit(1) # exit(1) を sys.exit(1) に修正
 
           genai.configure(api_key=api_key)
 
           try:
-              model = genai.GenerativeModel('gemini-pro') # または 'gemini-1.5-pro-latest' など、利用したいモデルを指定
+              # 利用可能なモデルを確認して最適なものを選択することを推奨
+              # 例: モデルのリストを確認して、generateContent をサポートするモデルを選ぶ
+              # for m in genai.list_models():
+              #     if 'generateContent' in m.supported_generation_methods:
+              #         print(f"Available model: {m.name}")
+
+              # 現在推奨されているモデルは 'gemini-1.5-pro-latest' など
+              # または、APIのバージョンによって異なる可能性があります。
+              # 最新の利用可能なモデルについては、Google AI Studioのドキュメントを確認してください。
+              model = genai.GenerativeModel('gemini-1.5-pro-latest') # または 'gemini-pro' が動作する可能性も考慮
+
               prompt = "くすっと笑える小話を書いて。5分くらいで読めるものがいいな。"
 
               # 生成処理
+              print(f"Calling Gemini API with prompt: '{prompt}'", file=sys.stderr) # デバッグ用にstderrに出力
               response = model.generate_content(prompt)
               generated_text = response.text.strip()
 
@@ -55,12 +68,12 @@ jobs:
               now = datetime.datetime.now()
               header_date = now.strftime("%Y-%m-%d")
               header_time = now.strftime("%H:%M")
-              print(f"## {header_date} {header_time} の記事")
+              print(f"## {header_date} {header_time} の記事") # 標準出力に記事内容を出力
               print(generated_text)
 
           except Exception as e:
-              print(f"An error occurred: {e}", file=os.stderr)
-              exit(1)
+              print(f"An error occurred: {e}", file=sys.stderr) # sys.stderr に修正
+              sys.exit(1) # sys.exit(1) に修正
           EOF
 
       - name: Update index.html
