@@ -1,41 +1,85 @@
-name: Generate Blog
+name: Generate Blog Post with Gemini
 
 on:
   schedule:
-    - cron: '0 3 * * *' # 毎日12:00 JST
-  workflow_dispatch:
+    - cron: '0 3 * * *' # 毎日 12:00 JST (UTC 3:00)
+  workflow_dispatch: # 手動実行を可能にする
 
 jobs:
   generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+    runs-on: ubuntu-latest # 実行環境
 
-      - name: Generate post with Pollinations
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # リポジトリをチェックアウト
+
+      - name: Set up Python
+        uses: actions/setup-python@v5 # Python環境をセットアップ
+        with:
+          python-version: '3.10' # 使用するPythonのバージョン
+
+      - name: Install Google Generative AI SDK
+        run: pip install -q -U google-generativeai # Gemini API SDKをインストール
+
+      - name: Generate post with Gemini API
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }} # GitHub Secrets から API キーを読み込む
         run: |
           DATE=$(date +"%Y-%m-%d")
           TIME=$(date +"%H-%M")
           mkdir -p posts
-          curl -s "https://text.pollinations.ai/くすっと笑える小話を書いて。5分くらいで読めるものがいいな。" > tmp.txt
-          echo "## ${DATE} ${TIME} の記事" > posts/${DATE}-${TIME}.md
-          cat tmp.txt >> posts/${DATE}-${TIME}.md
+
+          # Pythonスクリプトを実行してGemini APIを呼び出し、記事を生成
+          python - <<EOF > posts/${DATE}-${TIME}.md
+          import os
+          import google.generativeai as genai
+          import datetime
+
+          # 環境変数からAPIキーを取得
+          api_key = os.getenv('GOOGLE_API_KEY')
+          if not api_key:
+              print("Error: GOOGLE_API_KEY environment variable is not set.", file=os.stderr)
+              exit(1)
+
+          genai.configure(api_key=api_key)
+
+          try:
+              model = genai.GenerativeModel('gemini-pro') # または 'gemini-1.5-pro-latest' など、利用したいモデルを指定
+              prompt = "くすっと笑える小話を書いて。5分くらいで読めるものがいいな。"
+
+              # 生成処理
+              response = model.generate_content(prompt)
+              generated_text = response.text.strip()
+
+              # Markdownヘッダーの生成
+              now = datetime.datetime.now()
+              header_date = now.strftime("%Y-%m-%d")
+              header_time = now.strftime("%H:%M")
+              print(f"## {header_date} {header_time} の記事")
+              print(generated_text)
+
+          except Exception as e:
+              print(f"An error occurred: {e}", file=os.stderr)
+              exit(1)
+          EOF
 
       - name: Update index.html
         run: |
           echo "<html><body><h1>Blog</h1><ul>" > index.html
           for file in posts/*.md; do
-            title=$(head -n 1 "$file")
+            # 記事のタイトル（MarkdownのH2見出し）を抽出
+            # ファイルの最初の行を読み込み、'## 'を取り除く
+            title=$(head -n 1 "$file" | sed 's/^## //')
             echo "<li><a href=\"$file\">$title</a></li>" >> index.html
           done
           echo "</ul></body></html>" >> index.html
 
       - name: Commit and Push
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }} # 自動的に提供されるトークン
         run: |
-          git config user.name "ailabsgenerative"
-          git config user.email "ailabsgenerative@gmail.com"
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+          git config user.name "github-actions[bot]" # GitHub Actionsの公式botユーザー名
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com" # GitHub Actionsの公式botメールアドレス
           git add .
-          git commit -m "Add blog post $(date +'%Y-%m-%d %H:%M')" || echo "No changes"
+          git commit -m "Add new blog post $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit" # 変更がなければコミットしない
           git push origin HEAD
