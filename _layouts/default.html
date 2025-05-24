@@ -27,5 +27,32 @@
   <footer>
     <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
   </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 全ての解答ボタンを取得
+      const buttons = document.querySelectorAll('.show-answer-button');
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          // クリックされたボタンの親である .answer-section を取得
+          const answerSection = button.closest('.answer-section');
+          if (answerSection) {
+            // 解答内容の div を取得
+            const answerContent = answerSection.querySelector('.answer-content');
+            if (answerContent) {
+              // hidden クラスをトグル（あれば削除、なければ追加）
+              answerContent.classList.toggle('hidden');
+              // ボタンのテキストも変更
+              if (answerContent.classList.contains('hidden')) {
+                button.textContent = '解答を見る';
+              } else {
+                button.textContent = '解答を隠す';
+              }
+            }
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

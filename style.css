@@ -87,3 +87,48 @@ li a:hover {
 .back-link:hover {
     background-color: #0056b3;
 }
+
+/* 解答部分のスタイル */
+.answer-section {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px dashed #a0d8ff; /* 枠線 */
+    border-radius: 8px;
+    background-color: #f0f8ff; /* 薄い水色の背景 */
+    text-align: center; /* ボタンを中央寄せ */
+}
+
+.show-answer-button {
+    background-color: #4CAF50; /* 緑色のボタン */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-bottom: 15px; /* ボタンと解答内容の間に余白 */
+    transition: background-color 0.3s ease;
+}
+
+.show-answer-button:hover {
+    background-color: #45a049;
+}
+
+.answer-content {
+    /* 初期状態で非表示 */
+    display: none; 
+    text-align: left; /* 解答内容のテキストは左寄せに戻す */
+    padding-top: 10px; /* ボタンとの間にスペース */
+    border-top: 1px solid #e0e0e0; /* 解答とボタンの間の線 */
+    margin-top: 15px;
+}
+
+.answer-content.hidden {
+    /* hidden クラスが付いている場合は非表示 */
+    display: none;
+}
+
+.answer-content:not(.hidden) {
+    /* hidden クラスが付いていない場合は表示 */
+    display: block;
+}

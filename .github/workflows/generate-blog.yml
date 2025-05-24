@@ -37,6 +37,7 @@ jobs:
           import datetime
           import sys
           import json
+          import re # 正規表現モジュールをインポート
 
           api_key = os.getenv('GOOGLE_API_KEY')
           if not api_key:
@@ -49,8 +50,8 @@ jobs:
           毎日楽しめる謎解きの問題を作って。
           知識はいらず論理的に解ける問題や、ストーリーがあり楽しい問題を作って欲しい。
           問題の難易度は、小学生高学年から大人まで楽しめるレベルで。
-          解答も一緒に書いてね。
-          """
+          解答も一緒に書いてね。解答は必ず「## 解答」という見出しから始めてください。
+          """ # プロンプトに「## 解答」から始める指示を追加
 
           request_body = {
               "contents": [
@@ -85,15 +86,31 @@ jobs:
               header_date = now.strftime("%Y-%m-%d")
               header_time = now.strftime("%H:%M")
 
-              # Front Matterの追加
               print("---")
-              print(f"title: \"{header_date} {header_time} の謎\"") # リンク一覧に表示されるタイトル
-              print("layout: default") # Jekyllが使うレイアウト（後述）
-              print(f"date: {header_date} {header_time}:00 +0900") # タイムゾーン付きの日付
+              print(f"title: \"{header_date} {header_time} の謎\"")
+              print("layout: default")
+              print(f"date: {header_date} {header_time}:00 +0900")
               print("---")
-              # 元のMarkdownヘッダーは不要になるが、コンテンツとして残すことも可能
-              # print(f"## {header_date} {header_time} の謎") # これはJekyllが生成するtitleと重複するため、削除または調整を検討
-              print(generated_text.strip())
+              
+              # 解答部分を抽出・マークアップするロジック
+              # Geminiの出力が「## 解答」という見出しで始まることを前提とする
+              answer_pattern = re.compile(r'(^## 解答.*)', re.DOTALL) # 「## 解答」から始まる全てのテキストをキャプチャ
+              match = answer_pattern.search(generated_text)
+
+              if match:
+                  # 問題部分と解答部分を分割
+                  problem_text = generated_text[:match.start()].strip()
+                  answer_text = generated_text[match.start():].strip()
+                  
+                  # 解答部分をカスタムタグで囲む
+                  # Markdown内なので、生のHTMLタグを直接記述
+                  final_content = f"{problem_text}\n\n<div class=\"answer-section\">\n  <button class=\"show-answer-button\">解答を見る</button>\n  <div class=\"answer-content\">\n{answer_text}\n  </div>\n</div>"
+              else:
+                  # 解答見出しが見つからない場合は、そのまま出力
+                  final_content = generated_text.strip()
+                  print("Warning: '## 解答' heading not found in generated content. Answer will not be hidden.", file=sys.stderr)
+
+              print(final_content) # 最終的なコンテンツを出力
 
           except requests.exceptions.RequestException as e:
               print(f"HTTP request error: {e}", file=sys.stderr)
