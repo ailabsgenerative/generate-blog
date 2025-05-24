@@ -112,8 +112,13 @@ jobs:
           
           echo "<html><head><title>今日の謎解き</title><link rel=\"stylesheet\" href=\"style.css\">${GA_TAG}</head><body><h1>今日の謎解き</h1><ul>" > index.html
           for file in posts/*.md; do
-            title=$(head -n 1 "$file" | sed 's/^## //')
-            echo "<li><a href=\"$file\">$title</a></li>" >> index.html
+            # Front Matterからタイトルを抽出
+            # 例: title: "2025-05-24 16:25 の謎"
+            title=$(grep '^title:' "$file" | head -n 1 | cut -d'"' -f2) 
+            
+            # .md 拡張子を .html に変更
+            html_file="${file%.md}.html" 
+            echo "<li><a href=\"$html_file\">$title</a></li>" >> index.html
           done
           echo "</ul></body></html>" >> index.html
 
