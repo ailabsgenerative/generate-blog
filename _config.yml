@@ -1,0 +1,14 @@
+# _config.yml
+
+# サイトのタイトル
+title: 今日の謎解き
+
+# Markdownレンダラー（GitHub Pagesの推奨はkramdownまたはGFM）
+markdown: kramdown
+
+# Jekyllが無視するファイルやディレクトリ（もしあれば）
+exclude:
+  - .github
+  - .gitignore
+  - README.md
+  - LICENSE

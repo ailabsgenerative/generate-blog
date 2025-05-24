@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title }} | {{ site.title }}</title>
+  <link rel="stylesheet" href="/style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND27ME68WQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-ND27ME68WQ');
+  </script>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/"><h1>今日の謎解き</h1></a>
+    </nav>
+  </header>
+  <main class="markdown-body">
+    <h2>{{ page.title }}</h2>
+    {{ content }} {# ここにMarkdownから変換されたHTMLコンテンツが入る #}
+  </main>
+  <footer>
+    <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
+  </footer>
+</body>
+</html>

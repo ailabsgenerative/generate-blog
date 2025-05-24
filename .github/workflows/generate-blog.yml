@@ -44,7 +44,14 @@ jobs:
               sys.exit(1)
 
           api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-          prompt_text = "毎日楽しめる謎解きの問題を作って。知識はいらず論理的に解ける問題や、ストーリーがあり楽しい問題を作って欲しい。"
+
+          prompt_text = """
+          毎日楽しめる謎解きの問題を作って。
+          知識はいらず論理的に解ける問題や、ストーリーがあり楽しい問題を作って欲しい。
+          問題の難易度は、小学生高学年から大人まで楽しめるレベルで。
+          解答も一緒に書いてね。
+          """
+
           request_body = {
               "contents": [
                   {
@@ -77,7 +84,15 @@ jobs:
               now = datetime.datetime.now()
               header_date = now.strftime("%Y-%m-%d")
               header_time = now.strftime("%H:%M")
-              print(f"## {header_date} {header_time} の謎")
+
+              # Front Matterの追加
+              print("---")
+              print(f"title: \"{header_date} {header_time} の謎\"") # リンク一覧に表示されるタイトル
+              print("layout: default") # Jekyllが使うレイアウト（後述）
+              print(f"date: {header_date} {header_time}:00 +0900") # タイムゾーン付きの日付
+              print("---")
+              # 元のMarkdownヘッダーは不要になるが、コンテンツとして残すことも可能
+              # print(f"## {header_date} {header_time} の謎") # これはJekyllが生成するtitleと重複するため、削除または調整を検討
               print(generated_text.strip())
 
           except requests.exceptions.RequestException as e:
@@ -93,10 +108,8 @@ jobs:
 
       - name: Update index.html
         run: |
-          # Google Analytics タグを埋め込む
           GA_TAG="<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-ND27ME68WQ\"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-ND27ME68WQ');</script>"
           
-          # headタグとlinkタグ、そしてGAタグを追加
           echo "<html><head><title>今日の謎解き</title><link rel=\"stylesheet\" href=\"style.css\">${GA_TAG}</head><body><h1>今日の謎解き</h1><ul>" > index.html
           for file in posts/*.md; do
             title=$(head -n 1 "$file" | sed 's/^## //')
