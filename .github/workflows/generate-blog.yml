@@ -33,25 +33,18 @@ jobs:
           # Pythonスクリプトを実行してGemini APIを呼び出し、記事を生成
           python - <<EOF > posts/${DATE}-${TIME}.md
           import os
-          import requests # requestsモジュールをインポート
+          import requests
           import datetime
           import sys
-          import json # JSON操作のためにインポート
+          import json
 
-          # 環境変数からAPIキーを取得
           api_key = os.getenv('GOOGLE_API_KEY')
           if not api_key:
               print("Error: GOOGLE_API_KEY environment variable is not set.", file=sys.stderr)
               sys.exit(1)
 
-          # Gemini API のエンドポイントとモデル
-          # 今回は 'gemini-2.0-flash' を使用
           api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-
-          # プロンプト
           prompt_text = "毎日楽しめる謎解きの問題を作って。知識はいらず論理的に解ける問題や、ストーリーがあり楽しい問題を作って欲しい。"
-
-          # リクエストボディ
           request_body = {
               "contents": [
                   {
@@ -66,15 +59,10 @@ jobs:
 
           try:
               print(f"Calling Gemini API (Flash Model) with prompt: '{prompt_text}'", file=sys.stderr)
-
-              # HTTP POST リクエストの送信
               response = requests.post(api_url, headers={'Content-Type': 'application/json'}, json=request_body)
-              response.raise_for_status() # HTTPエラーが発生した場合に例外を発生させる
+              response.raise_for_status()
 
-              # レスポンスのJSONをパース
               response_data = response.json()
-
-              # 生成されたテキストの抽出
               generated_text = ""
               if 'candidates' in response_data and len(response_data['candidates']) > 0:
                   for part in response_data['candidates'][0]['content']['parts']:
@@ -86,12 +74,10 @@ jobs:
                       print(f"Content blocked due to: {response_data['promptFeedback']['blockReason']}", file=sys.stderr)
                   sys.exit(1)
 
-
-              # Markdownヘッダーの生成
               now = datetime.datetime.now()
               header_date = now.strftime("%Y-%m-%d")
               header_time = now.strftime("%H:%M")
-              print(f"## {header_date} {header_time} の謎") # ここを「の謎」に変更
+              print(f"## {header_date} {header_time} の謎")
               print(generated_text.strip())
 
           except requests.exceptions.RequestException as e:
@@ -107,7 +93,11 @@ jobs:
 
       - name: Update index.html
         run: |
-          echo "<html><head><title>今日の謎解き</title><link rel=\"stylesheet\" href=\"style.css\"></head><body><h1>今日の謎解き</h1><ul>" > index.html # headタグとlinkタグを追加
+          # Google Analytics タグを埋め込む
+          GA_TAG="<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-ND27ME68WQ\"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-ND27ME68WQ');</script>"
+          
+          # headタグとlinkタグ、そしてGAタグを追加
+          echo "<html><head><title>今日の謎解き</title><link rel=\"stylesheet\" href=\"style.css\">${GA_TAG}</head><body><h1>今日の謎解き</h1><ul>" > index.html
           for file in posts/*.md; do
             title=$(head -n 1 "$file" | sed 's/^## //')
             echo "<li><a href=\"$file\">$title</a></li>" >> index.html
