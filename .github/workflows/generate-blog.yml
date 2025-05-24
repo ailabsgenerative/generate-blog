@@ -1,5 +1,5 @@
 # .github/workflows/generate-blog.yml
-name: Generate Blog Post with Gemini (Flash Model)
+name: Generate Mystery Riddle Post
 
 on:
   schedule:
@@ -75,8 +75,6 @@ jobs:
               response_data = response.json()
 
               # 生成されたテキストの抽出
-              # レスポンス構造によってパスが異なる場合があります。
-              # 以下のパスは一般的なGemini APIの構造です。
               generated_text = ""
               if 'candidates' in response_data and len(response_data['candidates']) > 0:
                   for part in response_data['candidates'][0]['content']['parts']:
@@ -84,7 +82,6 @@ jobs:
                           generated_text += part['text']
               else:
                   print("Error: No text generated or unexpected response structure.", file=sys.stderr)
-                  # APIの安全設定によりコンテンツがブロックされた可能性もあります
                   if 'promptFeedback' in response_data and 'blockReason' in response_data['promptFeedback']:
                       print(f"Content blocked due to: {response_data['promptFeedback']['blockReason']}", file=sys.stderr)
                   sys.exit(1)
@@ -94,8 +91,8 @@ jobs:
               now = datetime.datetime.now()
               header_date = now.strftime("%Y-%m-%d")
               header_time = now.strftime("%H:%M")
-              print(f"## {header_date} {header_time} の記事")
-              print(generated_text.strip()) # 余分な空白を除去
+              print(f"## {header_date} {header_time} の謎") # ここを「の謎」に変更
+              print(generated_text.strip())
 
           except requests.exceptions.RequestException as e:
               print(f"HTTP request error: {e}", file=sys.stderr)
@@ -110,7 +107,7 @@ jobs:
 
       - name: Update index.html
         run: |
-          echo "<html><body><h1>Blog</h1><ul>" > index.html
+          echo "<html><body><h1>今日の謎解き</h1><ul>" > index.html # ここを「今日の謎解き」に変更
           for file in posts/*.md; do
             title=$(head -n 1 "$file" | sed 's/^## //')
             echo "<li><a href=\"$file\">$title</a></li>" >> index.html
