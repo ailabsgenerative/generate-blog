@@ -3,7 +3,8 @@ name: Generate Mystery Riddle Post
 
 on:
   schedule:
-    - cron: '0 3 * * *' # 毎日 12:00 JST (UTC 3:00)
+    # 起動回数を1時間に1回に設定
+    - cron: '0 * * * *' # 毎時0分に実行 (例: 0:00, 1:00, 2:00 ... UTC)
   workflow_dispatch: # 手動実行を可能にする
 
 jobs:
