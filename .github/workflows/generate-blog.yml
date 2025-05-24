@@ -49,7 +49,7 @@ jobs:
           api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
           # プロンプト
-          prompt_text = "くすっと笑える小話を書いて。5分くらいで読めるものがいいな。"
+          prompt_text = "毎日楽しめる謎解きの問題を作って。知識はいらず論理的に解ける問題や、ストーリーがあり楽しい問題を作って欲しい。"
 
           # リクエストボディ
           request_body = {
